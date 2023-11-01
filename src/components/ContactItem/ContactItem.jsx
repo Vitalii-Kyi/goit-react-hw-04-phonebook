@@ -5,10 +5,12 @@ export const ContactItem = ({ details: { name, number, id }, onDelete }) => {
     <>
       <HIPhoneOutline />
       <span>{name}</span>
-      <span>{number}</span>
-      <button type="button" onClick={() => onDelete(id)}>
-        Delete
-    </button >
+      <div>
+        <span>{number}</span>
+        <button type="button" onClick={() => onDelete(id)}>
+          Delete
+      </button >
+      </div>
     </>
   );
 };

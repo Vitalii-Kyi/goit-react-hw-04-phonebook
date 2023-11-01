@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const List = styled.ul`
-  width: 380px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap 12px;
@@ -34,14 +34,14 @@ export const List = styled.ul`
       margin-left: 36px;
       padding: 2px 8px;
       color: #000000;
-      background-color: #d9ead3;
+      background-color: #f4cccc;
       border: none;
       border-radius: 4px;
     }
 
     button:hover,
     button:focus {
-      background-color: #93c47d;
+      background-color: #ff7e6b;
       color: white;
     }
   }

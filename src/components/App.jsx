@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
@@ -7,35 +7,25 @@ import { Message } from './Message/Message';
 
 const LOCAL_STORAGE_KEY = 'contacts-list';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+const updateFromLocalStorage = () => {
+  const savedContacts = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const parsedContacts = JSON.parse(savedContacts);
 
-  componentDidMount() {
-    const savedContacts = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const parsedContacts = JSON.parse(savedContacts);
-
-     if (parsedContacts !== null) {
-      this.setState({ contacts: parsedContacts });
-    }
+  if (parsedContacts !== null) {
+    return parsedContacts;
   }
+  return [];
+};
 
-  componentDidUpdate(_, prevState) {
-    const nextContacts = this.state.contacts;
-    const prevContacts = prevState.contacts;
+export const App = () => {
+  const [contacts, setContacts] = useState(updateFromLocalStorage);
+  const [filter, setFilter] = useState('');
 
-    if (nextContacts !== prevContacts) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(nextContacts));
-    }
-  }
-
-  handleAddContact = newContact => {
+  const handleAddContact = newContact => {
     const enteredName = newContact.name;
 
     if (
-      this.state.contacts.some(
+      contacts.some(
         contact => contact.name.toLowerCase() === enteredName.toLowerCase()
       )
     ) {
@@ -43,52 +33,46 @@ export class App extends Component {
       return;
     }
 
-    this.setState(prevState => {
-      return { contacts: [...prevState.contacts, newContact] };
-    });
+    setContacts(prev => [...prev, newContact]);
   };
 
-  handleChangeFilter = newSymbol => {
-    this.setState({
-      filter: newSymbol,
-    });
+  const handleChangeFilter = newSymbol => {
+    setFilter(newSymbol);
   };
 
-  handleContactDelete = contactId => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(
-          contact => contact.id !== contactId
-        ),
-      };
-    });
+  const handleContactDelete = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId));
   };
 
-  render() {
-    const { filter, contacts } = this.state;
-    const filteredContacts = contacts.filter(contact =>
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+  }, [contacts]);
+
+  const filteredContacts = () => {
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
-    const contactsLength = this.state.contacts.length;
+  };
 
-    return (
-      <Box>
-        <h1>Phonebook</h1>
-        <ContactForm onAddContact={this.handleAddContact} />
+  const contactsLength = contacts.length;
 
-        <h2>Contacts</h2>
-        <Filter nameFilter={filter} onChange={this.handleChangeFilter} />
-        {contactsLength === 0 ? (
-          <Message message="Contact's list is empty..." />
-        ) : (
-          <ContactList
-            contacts={filteredContacts}
-            contactDelete={this.handleContactDelete}
-          />
-        )}
+  return (
+    <Box>
+      <h1>Phonebook</h1>
+      <ContactForm onAddContact={handleAddContact} />
 
-        <GlobalStyle />
-      </Box>
-    );
-  }
-}
+      <h2>Contacts</h2>
+      <Filter nameFilter={filter} onChange={handleChangeFilter} />
+      {contactsLength === 0 ? (
+        <Message message="Contact's list is empty..." />
+      ) : (
+        <ContactList
+          contacts={filteredContacts()}
+          contactDelete={handleContactDelete}
+        />
+      )}
+
+      <GlobalStyle/>
+    </Box>
+  );
+};

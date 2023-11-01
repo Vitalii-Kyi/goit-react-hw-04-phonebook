@@ -40,7 +40,7 @@ button {
 export const Box = styled.div`
   margin: 24px auto;
   padding: 36px;
-  width: 560px;
+  width: 480px;
   height: 100%;
   border: 1px solid #bcbcbc;
   border-radius: 4px;
